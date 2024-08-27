@@ -2,8 +2,9 @@ package cl.praxis.inmobiliaria.restController;
 
 import cl.praxis.inmobiliaria.entities.Estado;
 import cl.praxis.inmobiliaria.services.ICrudGenericoService;
-import cl.praxis.inmobiliaria.services.impl.EstadoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +21,13 @@ public class EstadoRestController {
     }
 
     @GetMapping("/estado")
-    public Estado buscarEstado(@RequestParam int id) {
-        return estadoService.buscarPorId(id);
+    public ResponseEntity<?> buscarEstado(@RequestParam int id) {
+        Estado estadoEncontrado = estadoService.buscarPorId(id);
+        if (estadoEncontrado == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Estado no encontrado");
+        }
+        return ResponseEntity.ok(estadoEncontrado);
     }
 
     @PostMapping("/nuevo")
@@ -30,12 +36,25 @@ public class EstadoRestController {
     }
 
     @PutMapping("/actualizar")
-    public Estado actualizarEstado(@RequestBody Estado estado) {
-        return estadoService.actualizar(estado);
+    public ResponseEntity<?> actualizarEstado(@RequestBody Estado estado) {
+        Estado estadoEncontrado = estadoService.buscarPorId(estado.getId());
+        if (estadoEncontrado == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Estado no encontrado");
+        }
+        estadoService.actualizar(estado);
+        return ResponseEntity.ok(estadoEncontrado);
     }
 
+
     @DeleteMapping("/eliminar")
-    public void eliminarEstado(@RequestBody Estado estado) {
+    public ResponseEntity<?> eliminarEstado(@RequestBody Estado estado) {
+        Estado estadoEncontrado = estadoService.buscarPorId(estado.getId());
+        if(estadoEncontrado == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Estado no encontrado");
+        }
         estadoService.remover(estado);
+        return ResponseEntity.ok(estadoEncontrado);
     }
 }

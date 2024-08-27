@@ -3,6 +3,8 @@ package cl.praxis.inmobiliaria.restController;
 import cl.praxis.inmobiliaria.entities.Propiedad;
 import cl.praxis.inmobiliaria.services.ICrudGenericoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,8 +21,13 @@ public class PropiedadRestController {
     }
 
     @GetMapping("/{id}")
-    public Propiedad buscarPropiedad(@PathVariable int id) {
-        return propiedadService.buscarPorId(id);
+    public ResponseEntity<?> buscarPropiedad(@PathVariable int id) {
+        Propiedad propiedadEncontrada = propiedadService.buscarPorId(id);
+        if (propiedadEncontrada == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Propiedad no encontrada");
+        }
+        return ResponseEntity.ok(propiedadEncontrada);
     }
 
     @PostMapping("/nuevo")
@@ -29,12 +36,24 @@ public class PropiedadRestController {
     }
 
     @PutMapping("/actualizar")
-    public Propiedad actualizarPropiedad(@RequestBody Propiedad propiedad) {
-        return propiedadService.actualizar(propiedad);
+    public ResponseEntity<?> actualizarPropiedad(@RequestBody Propiedad propiedad) {
+        Propiedad propiedadEncontrada = propiedadService.buscarPorId(propiedad.getId());
+        if (propiedadEncontrada == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Propiedad no encontrada");
+        }
+        propiedadService.actualizar(propiedad);
+        return ResponseEntity.ok(propiedad);
     }
 
     @DeleteMapping("/eliminar")
-    public void eliminarPropiedad(@RequestBody Propiedad propiedad) {
+    public ResponseEntity<?> eliminarPropiedad(@RequestBody Propiedad propiedad) {
+        Propiedad propiedadEncontrada = propiedadService.buscarPorId(propiedad.getId());
+        if (propiedadEncontrada == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Propiedad no encontrada");
+        }
         propiedadService.remover(propiedad);
+        return ResponseEntity.ok(propiedad);
     }
 }

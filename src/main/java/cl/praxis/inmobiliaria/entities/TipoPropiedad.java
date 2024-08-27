@@ -17,6 +17,6 @@ public class TipoPropiedad {
     private int id;
     private String descripcion;
 
-    @OneToMany(mappedBy = "tipoPropiedad", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "tipoPropiedad", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Propiedad> propiedades;
 }
